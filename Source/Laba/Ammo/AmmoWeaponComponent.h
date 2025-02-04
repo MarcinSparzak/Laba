@@ -46,6 +46,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	class UInputAction* FireAction;
 
+	/** Fire Input Action */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	class UInputAction* DropWeaponAction;
+
 	/** Sets default values for this component's properties */
 	UAmmoWeaponComponent();
 
@@ -56,6 +60,10 @@ public:
 	/** Make the weapon Fire a Projectile */
 	UFUNCTION(BlueprintCallable, Category = "Weapon")
 	void Fire();
+
+	/** Make the weapon Fire a Projectile */
+	UFUNCTION(BlueprintCallable, Category = "Weapon")
+	void DropWeapon();
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Projectile")
 	int Ammo;
@@ -69,4 +77,5 @@ protected:
 private:
 	/** The Character holding this weapon*/
 	AAmmoCharacter* Character;
+
 };

@@ -21,6 +21,7 @@ class LABA_API AAmmoCharacter : public ACharacter
 {
 	GENERATED_BODY()
 
+public:
 	/** Pawn mesh: 1st person view (arms; seen only by self) */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Mesh, meta = (AllowPrivateAccess = "true"))
 	USkeletalMeshComponent* Mesh1P;
@@ -45,7 +46,9 @@ class LABA_API AAmmoCharacter : public ACharacter
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	class UInputAction* LookAction;
 
-public:
+	UFUNCTION(BlueprintImplementableEvent, meta = (DisplayName = "DropWeapon"))
+	void DropWeapon();
+
 	// Sets default values for this character's properties
 	AAmmoCharacter();
 

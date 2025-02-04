@@ -46,6 +46,9 @@ bool UAmmoWeaponComponent::AttachWeapon(AAmmoCharacter* TargetCharacter)
 		{
 			// Fire
 			EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Triggered, this, &UAmmoWeaponComponent::Fire);
+			
+			// Drop Weapon
+			EnhancedInputComponent->BindAction(DropWeaponAction, ETriggerEvent::Triggered, this, &UAmmoWeaponComponent::DropWeapon);
 		}
 	}
 
@@ -100,6 +103,33 @@ void UAmmoWeaponComponent::Fire()
 			}
 		}
 	}
+}
+
+void UAmmoWeaponComponent::DropWeapon()
+{
+	// ensure we have a character owner
+	if (Character != nullptr)
+	{
+		// remove the input mapping context from the Player Controller
+		if (APlayerController* PlayerController = Cast<APlayerController>(Character->GetController()))
+		{
+			if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
+			{
+				Subsystem->RemoveMappingContext(FireMappingContext);
+			}
+		}
+
+		AmmoUpdate.RemoveAll(this);
+
+		Character->DropWeapon();
+	}
+
+	DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
+	SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
+	SetSimulatePhysics(true);
+	Ammo = 0;
+	AmmoUpdate.Broadcast(Character, Ammo);
+
 }
 
 void UAmmoWeaponComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
