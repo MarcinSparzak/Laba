@@ -18,57 +18,53 @@ ULabaWeaponComponent::ULabaWeaponComponent()
 {
 	// Default offset from the character location for projectiles to spawn
 	MuzzleOffset = FVector(100.0f, 0.0f, 10.0f);
-	Ammo = 10;
 }
 
 
 void ULabaWeaponComponent::Fire()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Ammo left: %d"), Ammo);
 	if (Character == nullptr || Character->GetController() == nullptr)
 	{
 		return;
 	}
-	if (Ammo > 0)
+
+	// Try and fire a projectile
+	if (ProjectileClass != nullptr)
 	{
-		// Try and fire a projectile
-		if (ProjectileClass != nullptr)
+		UWorld* const World = GetWorld();
+		if (World != nullptr)
 		{
-			UWorld* const World = GetWorld();
-			if (World != nullptr)
-			{
-				APlayerController* PlayerController = Cast<APlayerController>(Character->GetController());
-				const FRotator SpawnRotation = PlayerController->PlayerCameraManager->GetCameraRotation();
-				// MuzzleOffset is in camera space, so transform it to world space before offsetting from the character location to find the final muzzle position
-				const FVector SpawnLocation = GetOwner()->GetActorLocation() + SpawnRotation.RotateVector(MuzzleOffset);
+			APlayerController* PlayerController = Cast<APlayerController>(Character->GetController());
+			const FRotator SpawnRotation = PlayerController->PlayerCameraManager->GetCameraRotation();
+			// MuzzleOffset is in camera space, so transform it to world space before offsetting from the character location to find the final muzzle position
+			const FVector SpawnLocation = GetOwner()->GetActorLocation() + SpawnRotation.RotateVector(MuzzleOffset);
 
-				//Set Spawn Collision Handling Override
-				FActorSpawnParameters ActorSpawnParams;
-				ActorSpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButDontSpawnIfColliding;
+			//Set Spawn Collision Handling Override
+			FActorSpawnParameters ActorSpawnParams;
+			ActorSpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButDontSpawnIfColliding;
 
-				// Spawn the projectile at the muzzle
-				World->SpawnActor<ALabaProjectile>(ProjectileClass, SpawnLocation, SpawnRotation, ActorSpawnParams);
-				--Ammo;
-			}
-		}
-
-		// Try and play the sound if specified
-		if (FireSound != nullptr)
-		{
-			UGameplayStatics::PlaySoundAtLocation(this, FireSound, Character->GetActorLocation());
-		}
-
-		// Try and play a firing animation if specified
-		if (FireAnimation != nullptr)
-		{
-			// Get the animation object for the arms mesh
-			UAnimInstance* AnimInstance = Character->GetMesh1P()->GetAnimInstance();
-			if (AnimInstance != nullptr)
-			{
-				AnimInstance->Montage_Play(FireAnimation, 1.f);
-			}
+			// Spawn the projectile at the muzzle
+			World->SpawnActor<ALabaProjectile>(ProjectileClass, SpawnLocation, SpawnRotation, ActorSpawnParams);
 		}
 	}
+
+	// Try and play the sound if specified
+	if (FireSound != nullptr)
+	{
+		UGameplayStatics::PlaySoundAtLocation(this, FireSound, Character->GetActorLocation());
+	}
+
+	// Try and play a firing animation if specified
+	if (FireAnimation != nullptr)
+	{
+		// Get the animation object for the arms mesh
+		UAnimInstance* AnimInstance = Character->GetMesh1P()->GetAnimInstance();
+		if (AnimInstance != nullptr)
+		{
+			AnimInstance->Montage_Play(FireAnimation, 1.f);
+		}
+	}
+
 }
 
 bool ULabaWeaponComponent::AttachWeapon(ALabaCharacter* TargetCharacter)

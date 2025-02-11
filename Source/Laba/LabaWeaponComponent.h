@@ -48,10 +48,6 @@ public:
 	/** Make the weapon Fire a Projectile */
 	UFUNCTION(BlueprintCallable, Category="Weapon")
 	void Fire();
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Projectile")
-	int Ammo;
-
 protected:
 	/** Ends gameplay for this component. */
 	UFUNCTION()
